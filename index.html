@@ -951,9 +951,10 @@
     }
 
     function bookAssessment() {
-      // You can change this to your booking page URL when ready
-      window.location.href = "mailto:sales@generatorsolutions.ca?subject=On-Site%20Generator%20Assessment%20Request";
-    }
+  // Reuse the same detailed email as "Email These Results"
+  openEmailDraft();
+}
+
 
     function openEmailDraft() {
       const calc = window._lastCalc;
@@ -1009,6 +1010,7 @@
 
 </body>
 </html>
+
 
 
 
