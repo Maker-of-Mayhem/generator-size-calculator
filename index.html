@@ -612,7 +612,7 @@
     </main>
   </div>
 
-  <script>
+   <script>
     // Simple mapping text helpers
     function getSqftLabel(val) {
       switch (val) {
@@ -737,18 +737,30 @@
         poolPump: 3
       };
 
+      // Human-friendly appliance labels for display
+      const applianceLabels = {
+        fridge: "Fridge",
+        freezer: "Freezer",
+        microwave: "Microwave",
+        elecStove: "Electric stove / oven",
+        gasStoveIgnitor: "Gas stove ignitor only",
+        dishwasher: "Dishwasher",
+        washer: "Washer",
+        dryerElec: "Electric dryer",
+        dryerGas: "Gas dryer (motor only)",
+        sump: "Sump pump",
+        hotTub: "Hot tub",
+        poolPump: "Pool pump"
+      };
+
       appliances.forEach(a => {
         loadScore += applianceMap[a] || 0;
       });
 
       // Essential vs whole-home
       let effectiveKw = loadScore;
-      let coverageLabel = "";
       if (mode === "essential") {
         effectiveKw = Math.max(8, loadScore * 0.7); // keep reasonable floor
-        coverageLabel = "Essential Loads";
-      } else {
-        coverageLabel = "Whole-Home (approx.)";
       }
 
       // Add headroom margin
@@ -756,9 +768,6 @@
 
       // Now snap to recommended sizes
       let recommendedKw = 14;
-      const airCooledSizes = [14, 18, 24, 28]; // Next Gen air-cooled
-      const liquidCooledSizes = [32, 38, 48, 60, 80, 100, 150];
-
       let type = "Air-cooled standby (Next Generation 2026)";
       let notes = "";
 
@@ -805,6 +814,11 @@
         }
       }
 
+      // Build appliance list for display
+      const applianceNames = appliances.map(a => applianceLabels[a] || a);
+      const applianceCountText = appliances.length ? `${appliances.length}` : "None";
+      const applianceListText = appliances.length ? applianceNames.join(", ") : "None selected";
+
       updateResults({
         sqftVal,
         heatType,
@@ -815,7 +829,9 @@
         effectiveKw,
         recommendedKw,
         type,
-        notes
+        notes,
+        applianceCountText,
+        applianceListText
       });
     }
 
@@ -830,7 +846,9 @@
         effectiveKw,
         recommendedKw,
         type,
-        notes
+        notes,
+        applianceCountText,
+        applianceListText
       } = data;
 
       const resultSizeEl = document.getElementById("resultSize");
@@ -865,24 +883,14 @@
       headroomTag.textContent = "Includes safety headroom";
       tagPills.appendChild(headroomTag);
 
-      // Build appliance list for display
-const applianceNames = appliances.map(a => applianceLabels[a] || a);
-const applianceCountText = appliances.length
-  ? `${appliances.length}`
-  : "None";
-
-const applianceListText = appliances.length
-  ? applianceNames.join(", ")
-  : "None selected";
-
-// Update summary
-const items = [];
-items.push(`Square footage: ${getSqftLabel(sqftVal)}`);
-items.push(`Heating: ${getHeatLabel(heatType)}`);
-items.push(`Cooling: ${getAcLabel(acVal)}`);
-items.push(`Well pump: ${getWellLabel(wellVal)}`);
-items.push(`Number of appliances selected: ${applianceCountText}`);
-items.push(`Selected appliances: ${applianceListText}`);
+      // Update summary
+      const items = [];
+      items.push(`Square footage: ${getSqftLabel(sqftVal)}`);
+      items.push(`Heating: ${getHeatLabel(heatType)}`);
+      items.push(`Cooling: ${getAcLabel(acVal)}`);
+      items.push(`Well pump: ${getWellLabel(wellVal)}`);
+      items.push(`Number of appliances selected: ${applianceCountText}`);
+      items.push(`Selected appliances: ${applianceListText}`);
 
       summaryList.innerHTML = "";
       items.forEach(txt => {
@@ -892,19 +900,18 @@ items.push(`Selected appliances: ${applianceListText}`);
       });
 
       // Store latest results globally for email composition
-     window._lastCalc = {
-  recommendedKw,
-  type,
-  notes,
-  sqftLabel: getSqftLabel(sqftVal),
-  heatLabel: getHeatLabel(heatType),
-  acLabel: getAcLabel(acVal),
-  wellLabel: getWellLabel(wellVal),
-  mode: mode === "essential" ? "Essential loads" : "Whole-home (approx.)",
-  appliancesCount: appliances.length,
-  appliancesListText: applianceListText
-};
-
+      window._lastCalc = {
+        recommendedKw,
+        type,
+        notes,
+        sqftLabel: getSqftLabel(sqftVal),
+        heatLabel: getHeatLabel(heatType),
+        acLabel: getAcLabel(acVal),
+        wellLabel: getWellLabel(wellVal),
+        mode: mode === "essential" ? "Essential loads" : "Whole-home (approx.)",
+        appliancesCount: appliances.length,
+        appliancesListText: applianceListText
+      };
     }
 
     function resetForm() {
@@ -999,8 +1006,10 @@ items.push(`Selected appliances: ${applianceListText}`);
       window.location.href = mailto;
     }
   </script>
+
 </body>
 </html>
+
 
 
 
