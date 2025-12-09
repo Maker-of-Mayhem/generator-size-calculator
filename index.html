@@ -865,15 +865,24 @@
       headroomTag.textContent = "Includes safety headroom";
       tagPills.appendChild(headroomTag);
 
-      // Update summary
-      const items = [];
-      items.push(`Square footage: ${getSqftLabel(sqftVal)}`);
-      items.push(`Heating: ${getHeatLabel(heatType)}`);
-      items.push(`Cooling: ${getAcLabel(acVal)}`);
-      items.push(`Well pump: ${getWellLabel(wellVal)}`);
-      items.push(
-        `Appliances selected: ${appliances.length ? appliances.length : "None selected"}`
-      );
+      // Build appliance list for display
+const applianceNames = appliances.map(a => applianceLabels[a] || a);
+const applianceCountText = appliances.length
+  ? `${appliances.length}`
+  : "None";
+
+const applianceListText = appliances.length
+  ? applianceNames.join(", ")
+  : "None selected";
+
+// Update summary
+const items = [];
+items.push(`Square footage: ${getSqftLabel(sqftVal)}`);
+items.push(`Heating: ${getHeatLabel(heatType)}`);
+items.push(`Cooling: ${getAcLabel(acVal)}`);
+items.push(`Well pump: ${getWellLabel(wellVal)}`);
+items.push(`Number of appliances selected: ${applianceCountText}`);
+items.push(`Selected appliances: ${applianceListText}`);
 
       summaryList.innerHTML = "";
       items.forEach(txt => {
@@ -883,17 +892,19 @@
       });
 
       // Store latest results globally for email composition
-      window._lastCalc = {
-        recommendedKw,
-        type,
-        notes,
-        sqftLabel: getSqftLabel(sqftVal),
-        heatLabel: getHeatLabel(heatType),
-        acLabel: getAcLabel(acVal),
-        wellLabel: getWellLabel(wellVal),
-        mode: mode === "essential" ? "Essential loads" : "Whole-home (approx.)",
-        appliancesCount: appliances.length
-      };
+     window._lastCalc = {
+  recommendedKw,
+  type,
+  notes,
+  sqftLabel: getSqftLabel(sqftVal),
+  heatLabel: getHeatLabel(heatType),
+  acLabel: getAcLabel(acVal),
+  wellLabel: getWellLabel(wellVal),
+  mode: mode === "essential" ? "Essential loads" : "Whole-home (approx.)",
+  appliancesCount: appliances.length,
+  appliancesListText: applianceListText
+};
+
     }
 
     function resetForm() {
@@ -971,6 +982,7 @@
       lines.push(`• Cooling: ${calc.acLabel}`);
       lines.push(`• Well pump: ${calc.wellLabel}`);
       lines.push(`• Number of appliances selected: ${calc.appliancesCount}`);
+      lines.push(`• Selected appliances: ${calc.appliancesListText || "None listed"}`);
       lines.push("");
       lines.push("My contact details:");
       lines.push(`• Name: ${name || "(not provided)"}`);
@@ -989,6 +1001,7 @@
   </script>
 </body>
 </html>
+
 
 
 
